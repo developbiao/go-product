@@ -8,28 +8,27 @@ import (
 )
 
 type IProduct interface {
-	Conn()(error)
-	Insert(*datamodels.Product)(int64, error)
+	Conn() error
+	Insert(*datamodels.Product) (int64, error)
 	Delete(int64) bool
 	Update(*datamodels.Product) error
-	SelectByKey(int64)(*datamodels.Product, error)
-	SelectAll()([]*datamodels.Product, error)
+	SelectByKey(int64) (*datamodels.Product, error)
+	SelectAll() ([]*datamodels.Product, error)
 }
 
 type ProductManager struct {
-	table string
+	table     string
 	mysqlConn *sql.DB
 }
 
 func NewProductManager(table string, db *sql.DB) IProduct {
-	return &ProductManager{table: table, mysqlConn:db}
+	return &ProductManager{table: table, mysqlConn: db}
 }
-
 
 // ---------- Product CURD -----------
 
 // Create mysql connection
-func (p *ProductManager) Conn()(err error) {
+func (p *ProductManager) Conn() (err error) {
 	if p.mysqlConn != nil {
 		mysql, err := common.NewMysqlConn()
 		if err != nil {
@@ -52,7 +51,7 @@ func (p *ProductManager) Insert(product *datamodels.Product) (productId int64, e
 	}
 
 	// 2. Prepare sql
-	sql := "INSERT INTO " + p.table + " SET productName=?, productName=?, productImage=?, productUrl=?"
+	sql := "INSERT INTO " + p.table + " SET productName=?, productNum=?, productImage=?, productUrl=?"
 	stmt, errSql := p.mysqlConn.Prepare(sql)
 	if errSql != nil {
 		return 0, errSql
@@ -67,7 +66,7 @@ func (p *ProductManager) Insert(product *datamodels.Product) (productId int64, e
 }
 
 // Delete product
-func (p *ProductManager)Delete(productID int64) bool {
+func (p *ProductManager) Delete(productID int64) bool {
 	if err := p.Conn(); err != nil {
 		return false
 	}
@@ -86,7 +85,7 @@ func (p *ProductManager)Delete(productID int64) bool {
 }
 
 // Update product
-func (p *ProductManager)Update(product *datamodels.Product) error {
+func (p *ProductManager) Update(product *datamodels.Product) error {
 	if err := p.Conn(); err != nil {
 		return err
 	}
@@ -107,7 +106,7 @@ func (p *ProductManager)Update(product *datamodels.Product) error {
 
 // Get product by id
 
-func (p *ProductManager)SelectByKey(productID int64) (productResult *datamodels.Product, err error) {
+func (p *ProductManager) SelectByKey(productID int64) (productResult *datamodels.Product, err error) {
 	if err = p.Conn(); err != nil {
 		return &datamodels.Product{}, err
 	}
@@ -130,9 +129,8 @@ func (p *ProductManager)SelectByKey(productID int64) (productResult *datamodels.
 	return
 }
 
-
 // query all products
-func (p *ProductManager)SelectAll()(productArray []*datamodels.Product, errProduct error) {
+func (p *ProductManager) SelectAll() (productArray []*datamodels.Product, errProduct error) {
 	if err := p.Conn(); err != nil {
 		return nil, err
 	}
@@ -140,7 +138,7 @@ func (p *ProductManager)SelectAll()(productArray []*datamodels.Product, errProdu
 	rows, err := p.mysqlConn.Query(sql)
 	defer rows.Close()
 	if err != nil {
-		return nil ,err
+		return nil, err
 	}
 
 	result := common.GetResultRows(rows)
@@ -154,8 +152,5 @@ func (p *ProductManager)SelectAll()(productArray []*datamodels.Product, errProdu
 		productArray = append(productArray, product)
 	}
 
-	return productArray, nil
+	return
 }
-
-
-

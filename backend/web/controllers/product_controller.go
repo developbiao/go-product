@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"github.com/kataras/iris"
-	"github.com/kataras/iris/mvc"
+	"github.com/kataras/iris/v12"
+	"github.com/kataras/iris/v12/mvc"
 	"go-product/common"
 	"go-product/datamodels"
 	"go-product/services"
@@ -10,13 +10,13 @@ import (
 )
 
 type ProductController struct {
-	Ctx iris.Context
+	Ctx            iris.Context
 	ProductService services.IProductService
 }
 
 // Show all product
 func (p *ProductController) GetAll() mvc.View {
-	productArray ,_ := p.ProductService.GetAllProduct()
+	productArray, _ := p.ProductService.GetAllProduct()
 	return mvc.View{
 		Name: "product/view.html",
 		Data: iris.Map{
@@ -42,7 +42,7 @@ func (p *ProductController) PostUpdate() {
 
 // Show Add from
 func (p *ProductController) GetAdd() mvc.View {
-	return mvc.View {
+	return mvc.View{
 		Name: "product/add.html",
 	}
 }
@@ -76,6 +76,8 @@ func (p *ProductController) GetManager() mvc.View {
 		p.Ctx.Application().Logger().Debug(err)
 	}
 
+	p.Ctx.Application().Logger().Debug("ID is: " + idString)
+
 	return mvc.View{
 		Name: "product/manager.html",
 		Data: iris.Map{
@@ -102,6 +104,3 @@ func (p *ProductController) GetDelete() {
 
 	p.Ctx.Redirect("/product/all")
 }
-
-
-

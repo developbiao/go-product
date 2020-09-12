@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"github.com/kataras/iris/mvc"
 	"github.com/kataras/iris/v12"
+	"github.com/kataras/iris/v12/mvc"
 	"github.com/opentracing/opentracing-go/log"
 	"go-product/backend/web/controllers"
 	"go-product/common"
@@ -42,7 +42,6 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-
 	// 5. register controller
 	productRepository := repositories.NewProductManager("product", db)
 	productService := services.NewProductService(productRepository)
@@ -51,12 +50,11 @@ func main() {
 	product.Register(ctx, productService)
 	product.Handle(new(controllers.ProductController))
 
-
 	// 6. start server
 	app.Run(
 		iris.Addr("localhost:8080"),
 		iris.WithoutServerError(iris.ErrServerClosed),
 		iris.WithOptimizations,
-		)
+	)
 
 }

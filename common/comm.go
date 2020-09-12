@@ -1,10 +1,11 @@
 package common
 
 import (
-	"reflect"
-	"time"
-	"strconv"
 	"errors"
+	"fmt"
+	"reflect"
+	"strconv"
+	"time"
 )
 
 //根据结构体中sql标签映射数据到结构体中并且转换类型
@@ -15,6 +16,7 @@ func DataToStructByTagSql(data map[string]string, obj interface{}) {
 		value := data[objValue.Type().Field(i).Tag.Get("sql")]
 		//获取对应字段的名称
 		name := objValue.Type().Field(i).Name
+		fmt.Println(name, value)
 		//获取对应字段类型
 		structFieldType := objValue.Field(i).Type()
 		//获取变量类型，也可以直接写"string类型"
@@ -66,4 +68,3 @@ func TypeConversion(value string, ntype string) (reflect.Value, error) {
 
 	return reflect.ValueOf(value), errors.New("未知的类型：" + ntype)
 }
-
