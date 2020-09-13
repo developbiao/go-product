@@ -8,8 +8,8 @@ import (
 type IOrderService interface {
 	GetOrderByID(int64) (*datamodels.Order, error)
 	DeleteOrderByID(int64) bool
-	UpdateOrder(order *datamodels.Order) error
-	InsertOrder(order *datamodels.Order) (int64, error)
+	UpdateOrder(*datamodels.Order) error
+	InsertOrder(*datamodels.Order) (int64, error)
 	GetAllOrder() ([]*datamodels.Order, error)
 	GetAllOrderInfo() (map[int]map[string]string, error)
 }
