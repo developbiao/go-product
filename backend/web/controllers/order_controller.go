@@ -14,7 +14,7 @@ type OrderController struct {
 func (o *OrderController) Get() mvc.View {
 	orderArray, err := o.OrderService.GetAllOrderInfo()
 	if err != nil {
-		o.Ctx.Application().Logger().Debug("查询订单信息失败")
+		o.Ctx.Application().Logger().Debug("Query order failed")
 	}
 
 	return mvc.View{
