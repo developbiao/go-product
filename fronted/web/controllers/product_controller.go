@@ -5,6 +5,9 @@ import (
 	"github.com/kataras/iris/v12/mvc"
 	"go-product/datamodels"
 	"go-product/services"
+	"html/template"
+	"os"
+	"path/filepath"
 	"strconv"
 )
 
@@ -12,6 +15,67 @@ type ProductController struct {
 	Ctx            iris.Context
 	ProductService services.IProductService
 	OrderService   services.IOrderService
+}
+
+var (
+	// Generate html path
+	htmlOutPath = "./fronted/web/htmlProductShow/"
+	// Static template path
+	templatePath = "./fronted/web/views/template/"
+)
+
+// Generate product static page
+func (p *ProductController) GetGenerateHtml() {
+	// Get product id
+	productString := p.Ctx.URLParam("productID")
+	productID, err := strconv.Atoi(productString)
+	if err != nil {
+		p.Ctx.Application().Logger().Debug(err)
+	}
+
+	// Get template
+	contensTmp, err := template.ParseFiles(filepath.Join(templatePath, "product.html"))
+	if err != nil {
+		p.Ctx.Application().Logger().Debug(err)
+	}
+
+	// Get output html path
+	fileName := filepath.Join(htmlOutPath, "htmlProduct.html")
+
+	// Get render data
+	product, err := p.ProductService.GetProductByID(int64(productID))
+	if err != nil {
+		p.Ctx.Application().Logger().Debug(err)
+	}
+
+	// Generate status file
+	generateStaticHtml(p.Ctx, contensTmp, fileName, product)
+
+}
+
+func generateStaticHtml(ctx iris.Context, template *template.Template,
+	fileName string, product *datamodels.Product) {
+	// 1. check file exists?
+	if exist(fileName) {
+		err := os.Remove(fileName)
+		if err != nil {
+			ctx.Application().Logger().Error(err)
+		}
+	}
+
+	//  2. Generate status file
+	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY, os.ModePerm)
+	if err != nil {
+		ctx.Application().Logger().Error(err)
+	}
+	defer file.Close()
+	template.Execute(file, &product)
+
+}
+
+func exist(fileName string) bool {
+	_, err := os.Stat(fileName)
+	return err == nil || os.IsExist(err)
 }
 
 func (p *ProductController) GetDetail() mvc.View {
