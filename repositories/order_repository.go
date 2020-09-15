@@ -45,7 +45,7 @@ func (o *OrderMangerRepository) Insert(order *datamodels.Order) (productID int64
 		return
 	}
 
-	sql := "INSERT " + o.table + " set userID=?,productID=?,orderStatus=?"
+	sql := "INSERT `" + o.table + "` SET userID=?, productID=?, orderStatus=?"
 	stmt, errStmt := o.mysqlConn.Prepare(sql)
 	if errStmt != nil {
 		return productID, errStmt
@@ -78,7 +78,7 @@ func (o *OrderMangerRepository) Update(order *datamodels.Order) (err error) {
 		return errConn
 	}
 
-	sql := "Update " + o.table + " set userID=?,productID=?,orderStatus=? Where ID=" + strconv.FormatInt(order.ID, 10)
+	sql := "UPDATE " + o.table + " SET userID=?, productID=?, orderStatus=? WHERE ID=" + strconv.FormatInt(order.ID, 10)
 	stmt, errStmt := o.mysqlConn.Prepare(sql)
 	if errStmt != nil {
 		return errStmt
@@ -92,7 +92,7 @@ func (o *OrderMangerRepository) SelectByKey(orderID int64) (order *datamodels.Or
 		return &datamodels.Order{}, errConn
 	}
 
-	sql := "Select * From " + o.table + " where ID=" + strconv.FormatInt(orderID, 10)
+	sql := "SELECT * FROM " + o.table + " WHERE ID=" + strconv.FormatInt(orderID, 10)
 	row, errRow := o.mysqlConn.Query(sql)
 	if errRow != nil {
 		return &datamodels.Order{}, errRow

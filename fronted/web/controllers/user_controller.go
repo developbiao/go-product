@@ -46,6 +46,12 @@ func (c *UserController) PostRegister() {
 	return
 }
 
+func (c *UserController) GetLogin() mvc.View {
+	return mvc.View{
+		Name: "user/login.html",
+	}
+}
+
 func (c *UserController) PostLogin() mvc.Response {
 	// 1. get user submit form information
 	var (

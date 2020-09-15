@@ -12,13 +12,13 @@ func NewMysqlConn() (db *sql.DB, err error) {
 }
 
 //获取返回值，获取一条
-func GetResultRow(rows *sql.Rows) map[string]string{
+func GetResultRow(rows *sql.Rows) map[string]string {
 	columns, _ := rows.Columns()
 	scanArgs := make([]interface{}, len(columns))
-	values := make([]interface{}, len(columns))
+	values := make([][]byte, len(columns))
 	for j := range values {
 		scanArgs[j] = &values[j]
-	}	
+	}
 	record := make(map[string]string)
 	for rows.Next() {
 		//将行数据保存到record字典
@@ -26,7 +26,7 @@ func GetResultRow(rows *sql.Rows) map[string]string{
 		for i, v := range values {
 			if v != nil {
 				//fmt.Println(reflect.TypeOf(col))
-				record[columns[i]] = string(v.([]byte))
+				record[columns[i]] = string(v)
 			}
 		}
 	}
@@ -64,4 +64,3 @@ func GetResultRows(rows *sql.Rows) map[int]map[string]string {
 	}
 	return result
 }
-

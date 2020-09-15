@@ -7,6 +7,7 @@ import (
 	"github.com/kataras/iris/v12/sessions"
 	"github.com/opentracing/opentracing-go/log"
 	"go-product/common"
+	"go-product/fronted/middleware"
 	"go-product/fronted/web/controllers"
 	"go-product/repositories"
 	"go-product/services"
@@ -51,11 +52,23 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	// user controller register
 	user := repositories.NewUserRepository("user", db)
 	userService := services.NewService(user)
 	userPro := mvc.New(app.Party("/user"))
 	userPro.Register(userService, ctx, sess.Start)
 	userPro.Handle(new(controllers.UserController))
+
+	// product controller register
+	product := repositories.NewProductManager("product", db)
+	productService := services.NewProductService(product)
+	order := repositories.NewOrderMangerRepository("order", db)
+	orderService := services.NewOrderService(order)
+	proProduct := app.Party("/product")
+	pro := mvc.New(proProduct)
+	proProduct.Use(middleware.AuthConProduct)
+	pro.Register(productService, orderService)
+	pro.Handle(new(controllers.ProductController))
 
 	app.Run(
 		iris.Addr("0.0.0.0:8082"),
