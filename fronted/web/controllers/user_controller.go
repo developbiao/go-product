@@ -1,10 +1,12 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/mvc"
 	"github.com/kataras/iris/v12/sessions"
 	"go-product/datamodels"
+	"go-product/encrypt"
 	"go-product/services"
 	"go-product/tool"
 	"strconv"
@@ -69,7 +71,14 @@ func (c *UserController) PostLogin() mvc.Response {
 
 	// 3. Write user ID to cookie
 	tool.GlobalCookie(c.Ctx, "uid", strconv.FormatInt(user.ID, 10))
-	c.Session.Set("userID", strconv.FormatInt(user.ID, 10))
+	uidByte := []byte(strconv.FormatInt(user.ID, 10))
+	uidString, err := encrypt.EnPwdCode(uidByte)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// Write sign to user browser
+	tool.GlobalCookie(c.Ctx, "sign", uidString)
 
 	return mvc.Response{
 		Path: "/product/",

@@ -4,14 +4,12 @@ import (
 	"context"
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/mvc"
-	"github.com/kataras/iris/v12/sessions"
 	"github.com/opentracing/opentracing-go/log"
 	"go-product/common"
 	"go-product/fronted/middleware"
 	"go-product/fronted/web/controllers"
 	"go-product/repositories"
 	"go-product/services"
-	"time"
 )
 
 func main() {
@@ -43,12 +41,6 @@ func main() {
 		log.Error(err)
 	}
 
-	// init session
-	sess := sessions.New(sessions.Config{
-		Cookie:  "AdminCookie",
-		Expires: 600 * time.Minute,
-	})
-
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -56,7 +48,7 @@ func main() {
 	user := repositories.NewUserRepository("user", db)
 	userService := services.NewService(user)
 	userPro := mvc.New(app.Party("/user"))
-	userPro.Register(userService, ctx, sess.Start)
+	userPro.Register(userService, ctx)
 	userPro.Handle(new(controllers.UserController))
 
 	// product controller register
