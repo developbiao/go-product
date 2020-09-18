@@ -107,3 +107,50 @@ func (c *Consistent) add(element string) {
 		c.updateSortedHashes()
 	}
 }
+
+// Delete a node
+func (c *Consistent) Remove(element string) {
+	c.Lock()
+	defer c.Unlock()
+	c.remove(element)
+
+}
+
+func (c *Consistent) remove(element string) {
+	for i := 0; i < c.VirtualNode; i++ {
+		delete(c.circle, c.hashKey(c.generateKey(element, i)))
+	}
+	c.updateSortedHashes()
+}
+
+// Search by clockwise neighbour
+func (c *Consistent) search(key uint32) int {
+	// query algorithm
+	f := func(x int) bool {
+		return c.sortedHashes[x] > key
+	}
+
+	// Use binary search
+	i := sort.Search(len(c.sortedHashes), f)
+
+	// if out of range, set i= 0
+	if i >= len(c.sortedHashes) {
+		i = 0
+	}
+	return i
+}
+
+// Get server node by identify
+func (c *Consistent) Get(name string) (string, error) {
+	c.RLock()
+	defer c.RUnlock()
+
+	if len(c.circle) == 0 {
+		return "", errEmpty
+	}
+
+	// compute hash value
+	key := c.hashKey(name)
+	i := c.search(key)
+	return c.circle[c.sortedHashes[i]], nil
+}
