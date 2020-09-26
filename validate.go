@@ -12,9 +12,9 @@ import (
 )
 
 // Set Cluster ip
-var hostArray = []string{"127.0.0.1", "192.168.56.38"}
+var hostArray = []string{"127.0.0.1", "127.0.0.1"}
 
-var localHost = "192.168.56.38"
+var localHost = "127.0.0.1"
 
 var port = "8081"
 
@@ -41,7 +41,7 @@ func (m *AccessControl) GetNewRecord(uid int) interface{} {
 // Set record
 func (m *AccessControl) SetNewRecord(uid int) {
 	m.RWMutex.Lock()
-	m.sourcesArray[uid] = "Hello goper"
+	m.sourcesArray[uid] = "Hello golang"
 	m.RWMutex.Unlock()
 }
 

@@ -100,12 +100,11 @@ func (c *Consistent) Add(element string) {
 
 func (c *Consistent) add(element string) {
 	for i := 0; i < c.VirtualNode; i++ {
-		// compute node key and add node to hash circel
+		// compute node key and add node to hash circle
 		c.circle[c.hashKey(c.generateKey(element, i))] = element
-
-		// Update sort
-		c.updateSortedHashes()
 	}
+	// Update sort
+	c.updateSortedHashes()
 }
 
 // Delete a node
