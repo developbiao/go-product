@@ -9,8 +9,9 @@ type IProductService interface {
 	GetProductByID(int64) (*datamodels.Product, error)
 	GetAllProduct() ([]*datamodels.Product, error)
 	DeleteProductByID(int64) bool
-	InsertProduct(product *datamodels.Product)(int64, error)
+	InsertProduct(product *datamodels.Product) (int64, error)
 	UpdateProduct(product *datamodels.Product) error
+	SubNumberOne(productID int64) error
 }
 
 type ProductService struct {
@@ -18,7 +19,7 @@ type ProductService struct {
 }
 
 // init
-func NewProductService (repository repositories.IProduct) IProductService {
+func NewProductService(repository repositories.IProduct) IProductService {
 	return &ProductService{repository}
 }
 
@@ -40,4 +41,8 @@ func (p *ProductService) InsertProduct(product *datamodels.Product) (int64, erro
 
 func (p *ProductService) UpdateProduct(product *datamodels.Product) error {
 	return p.productRepository.Update(product)
+}
+
+func (p *ProductService) SubNumberOne(productID int64) error {
+	return p.productRepository.SubProductNum(productID)
 }
