@@ -34,7 +34,7 @@ func main() {
 		ctx.View("shared/error.html")
 	})
 
-	// Conenct to database
+	// Connect to database
 	db, err := common.NewMysqlConn()
 	if err != nil {
 		log.Error(err)

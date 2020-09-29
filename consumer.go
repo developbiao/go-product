@@ -9,6 +9,7 @@ import (
 )
 
 func main() {
+	// Product consumer
 	db, err := common.NewMysqlConn()
 	if err != nil {
 		fmt.Println(err)

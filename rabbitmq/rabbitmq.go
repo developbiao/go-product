@@ -7,6 +7,7 @@ import (
 	"go-product/datamodels"
 	"go-product/services"
 	"log"
+	"sync"
 )
 
 // rabbitmq connection information
@@ -27,6 +28,7 @@ type RabbitMQ struct {
 
 	// Connection information
 	Mqurl string
+	sync.Mutex
 }
 
 // Create struct instance
@@ -65,7 +67,9 @@ func NewRabbitMQSimple(queueName string) *RabbitMQ {
 }
 
 // simple producer
-func (r *RabbitMQ) PublishSimple(message string) {
+func (r *RabbitMQ) PublishSimple(message string) error {
+	r.Lock()
+	defer r.Unlock()
 	// request queue if not exists create queue
 	_, err := r.channel.QueueDeclare(
 		r.QueueName,
@@ -77,7 +81,7 @@ func (r *RabbitMQ) PublishSimple(message string) {
 	)
 
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
 
 	// call channel send message to queue
@@ -90,6 +94,7 @@ func (r *RabbitMQ) PublishSimple(message string) {
 			ContentType: "text/plain",
 			Body:        []byte(message),
 		})
+	return nil
 }
 
 // simple consumer
