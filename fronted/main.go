@@ -8,6 +8,7 @@ import (
 	"go-product/common"
 	"go-product/fronted/middleware"
 	"go-product/fronted/web/controllers"
+	"go-product/rabbitmq"
 	"go-product/repositories"
 	"go-product/services"
 )
@@ -51,6 +52,9 @@ func main() {
 	userPro.Register(userService, ctx)
 	userPro.Handle(new(controllers.UserController))
 
+	// new rabbitmq instance
+	rabbitmq := rabbitmq.NewRabbitMQSimple("golang")
+
 	// product controller register
 	product := repositories.NewProductManager("product", db)
 	productService := services.NewProductService(product)
@@ -59,7 +63,7 @@ func main() {
 	proProduct := app.Party("/product")
 	pro := mvc.New(proProduct)
 	proProduct.Use(middleware.AuthConProduct)
-	pro.Register(productService, orderService)
+	pro.Register(productService, orderService, rabbitmq)
 	pro.Handle(new(controllers.ProductController))
 
 	app.Run(

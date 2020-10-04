@@ -25,7 +25,7 @@ func main() {
 	// create order service
 	orderService := services.NewOrderService(order)
 
-	rabbitmqConsumeSimple := rabbitmq.NewRabbitMQSimple("golangProduct")
+	rabbitmqConsumeSimple := rabbitmq.NewRabbitMQSimple("golang")
 	rabbitmqConsumeSimple.ConsumeSimple(orderService, productService)
 
 }
