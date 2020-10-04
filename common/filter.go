@@ -1,6 +1,9 @@
 package common
 
-import "net/http"
+import (
+	"net/http"
+	"strings"
+)
 
 // Declare new data type function type
 type FilterHandle func(rw http.ResponseWriter, req *http.Request) error
@@ -33,7 +36,7 @@ type WebHandle func(rw http.ResponseWriter, req *http.Request)
 func (f *Filter) Handle(webHandle WebHandle) func(rw http.ResponseWriter, req *http.Request) {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		for path, handle := range f.filterMap {
-			if path == r.RequestURI {
+			if strings.Contains(r.RequestURI, path) {
 				// Execute interceptor logic
 				err := handle(rw, r)
 				if err != nil {
