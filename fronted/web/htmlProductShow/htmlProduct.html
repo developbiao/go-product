@@ -548,17 +548,12 @@
 
                         <div class="row row-10 product-single__actions clearfix">
                             <div class="col">
-                                <a href="#" class="btn btn-lg btn-color product-single__add-to-cart">
-                                    <i class="ui-bag"></i>
-                                    <span ><a href="/product/order?productID=2">立即抢购</a> </span>
-
-                                </a>
+                                <input id="productID" value="2" hidden>
+                                <input type="button" value="立即抢购" id="getButton" onclick="rushToBuy()">
                             </div>
                             <div class="col">
-                                <a href="#" class="btn btn-lg btn-dark product-single__add-to-wishlist">
-                                    <i class="ui-heart"></i>
-                                    <span>Wishlist</span>
-                                </a>
+                                <!-- write code here -->
+
                             </div>
                         </div>
                     </form>
@@ -1027,6 +1022,96 @@
 
 
 
+<script type="text/javascript">
+    // user id cookie name
+    var userString = "uid";
+    // rush button id
+    var rushButtonID = "getButton";
+    // redirect address
+    var redirectUrl = "/user/login";
+    // time interval
+    var interval = 10;
+    // count down
+    var count = interval;
+    var inter = null;
+
+    // get browser cooke
+    function getCookie(name) {
+        var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+        if (arr = document.cookie.match(reg)) {
+            return unescape(arr[2]);
+        }else {
+            return null;
+        }
+    }
+
+    // When not login, force to login page
+    if (getCookie(userString) == null) {
+        location.href = redirectUrl
+    }
+
+    // rush to buy function
+    function rushToBuy() {
+        // Get request parameter
+        var productID = document.getElementById("productID").value;
+        // Set button is disabled
+        document.getElementById(rushButtonID).setAttribute("disabled", true);
+        // time count down
+        timeSub();
+
+        var xmlHttp;
+        if (window.XMLHttpRequest) {
+            xmlHttp = new XMLHttpRequest();
+        } else {
+            xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+
+        xmlHttp.onreadystatechange = function () {
+
+            // waitting server response
+            if (xmlHttp.readyState == 4) {
+                if (xmlHttp.status == 200) {
+                    var result = xmlHttp.responseText;
+                    // check status
+                    if (result == "false") {
+                        alert("未抢到，请稍后重试！");
+                    } else {
+                        // location.href = "/product"
+                        alert("抢购成功")
+                    }
+                }
+
+            }
+        }
+
+        // bind request server address
+        xmlHttp.open("GET", "http://localhost:8083/check?productID=" + productID, true);
+
+        // set request
+        xmlHttp.send();
+
+
+    }
+
+    function timeSub() {
+        inter = setInterval("timeFunc()", 1000)
+    }
+
+    function timeFunc() {
+        count --;
+        if (count <= 0 ) {
+            count = interval;
+            // enable rush button
+            document.getElementById(rushButtonID).removeAttribute("disabled");
+            // Set button name
+            document.getElementById(rushButtonID).value = "立即抢购";
+            clearInterval(inter);
+        } else {
+            document.getElementById(rushButtonID).value= "抢购等待" + count + "秒";
+        }
+    }
+
+</script>
 
 <script type="text/javascript" src="/public/js/jquery.min.js"></script>
 <script type="text/javascript" src="/public/js/bootstrap.min.js"></script>

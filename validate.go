@@ -20,7 +20,7 @@ var hostArray = []string{"127.0.0.1", "127.0.0.1"}
 
 var localHost = ""
 
-// Product number control inner server ip, Or getone SLB intranet server ip
+// Product number control inner server ip, Or getOne SLB intranet server ip
 var GetOneIp = "127.0.0.1"
 
 var GetOnePort = "8084"
@@ -69,6 +69,8 @@ func (m *AccessControl) GetDistributedRight(req *http.Request) bool {
 	if err != nil {
 		return false
 	}
+
+	fmt.Println("===> Host Request is :" + hostRequest)
 
 	// check is local server
 	if hostRequest == localHost {
@@ -161,6 +163,7 @@ func CheckRight(w http.ResponseWriter, r *http.Request) {
 	right := accessControl.GetDistributedRight(r)
 	if !right {
 		w.Write([]byte("false"))
+		return
 	}
 	w.Write([]byte("true"))
 	return
@@ -175,7 +178,7 @@ func Check(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	productString := queryForm["productID"][0]
-	fmt.Println(productString)
+	fmt.Println("Got productID: " + productString)
 	// Get user cookie
 	userCookie, err := r.Cookie("uid")
 	if err != nil {
@@ -303,6 +306,12 @@ func main() {
 	// Create rabbitmq instance
 	rabbitMqValidate = rabbitmq.NewRabbitMQSimple("golang")
 	defer rabbitMqValidate.Destory()
+
+	// Setting static directory
+	http.Handle("/html/", http.StripPrefix("/html/", http.FileServer(http.Dir("./fronted/web/htmlProductShow"))))
+
+	// Setting resource directory
+	http.Handle("/public/", http.StripPrefix("/public", http.FileServer(http.Dir("./fronted/web/public"))))
 
 	// 1. filter
 	filter := common.NewFilter()
