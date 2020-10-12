@@ -16,7 +16,7 @@ import (
 )
 
 // Set Cluster ip
-var hostArray = []string{"127.0.0.1", "127.0.0.1"}
+var hostArray = []string{"127.0.0.1", "localhost"}
 
 var localHost = ""
 
@@ -70,8 +70,6 @@ func (m *AccessControl) GetDistributedRight(req *http.Request) bool {
 		return false
 	}
 
-	fmt.Println("===> Host Request is :" + hostRequest)
-
 	// check is local server
 	if hostRequest == localHost {
 		// execute data read
@@ -102,8 +100,10 @@ func (m *AccessControl) GetDataFromMap(uid string) (isOk bool) {
 func GetDataFromOtherMap(host string, request *http.Request) bool {
 	// proxy server mock visit
 	hostUrl := "http://" + host + ":" + port + "/checkRight"
+	fmt.Println("Proxy Host url:" + hostUrl)
 	response, body, err := GetCurl(hostUrl, request)
 	if err != nil {
+		fmt.Println("proxy false [01]")
 		return false
 	}
 
@@ -112,10 +112,12 @@ func GetDataFromOtherMap(host string, request *http.Request) bool {
 		if string(body) == "true" {
 			return true
 		} else {
+			fmt.Println("proxy false [02]")
 			return false
 		}
 	}
 
+	fmt.Println("proxy false [03]")
 	return false
 }
 
@@ -127,11 +129,13 @@ func GetCurl(hostUrl string, request *http.Request) (response *http.Response, bo
 		return
 	}
 
+	fmt.Println("Curl [01]")
 	// Get sign
 	uidSign, err := request.Cookie("sign")
 	if err != nil {
 		return
 	}
+	fmt.Println("Curl [02]")
 
 	// proxy server mock visit
 	client := &http.Client{}
@@ -139,6 +143,7 @@ func GetCurl(hostUrl string, request *http.Request) (response *http.Response, bo
 	if err != nil {
 		return
 	}
+	fmt.Println("Curl [03]")
 
 	// Prepare cookie arguments
 	cookieUid := &http.Cookie{Name: "uid", Value: uidPre.Value, Path: "/"}
@@ -148,6 +153,8 @@ func GetCurl(hostUrl string, request *http.Request) (response *http.Response, bo
 	req.AddCookie(cookieUid)
 	req.AddCookie(cookieSign)
 
+	fmt.Println("Curl [04]")
+
 	// Get response result
 	response, err = client.Do(req)
 	defer response.Body.Close()
@@ -155,7 +162,9 @@ func GetCurl(hostUrl string, request *http.Request) (response *http.Response, bo
 		return
 	}
 
+	fmt.Println("Curl [05]")
 	body, err = ioutil.ReadAll(response.Body)
+	fmt.Println("Curl [06]")
 	return
 }
 
@@ -183,6 +192,7 @@ func Check(w http.ResponseWriter, r *http.Request) {
 	userCookie, err := r.Cookie("uid")
 	if err != nil {
 		w.Write([]byte("false"))
+		return
 	}
 	fmt.Println("User Cookie:" + userCookie.Value)
 
@@ -190,6 +200,7 @@ func Check(w http.ResponseWriter, r *http.Request) {
 	right := accessControl.GetDistributedRight(r)
 	if right == false {
 		w.Write([]byte("false"))
+		return
 	}
 
 	// 2. Get number control prevent oversold in spikes
@@ -197,6 +208,7 @@ func Check(w http.ResponseWriter, r *http.Request) {
 	responseValidate, validateBody, err := GetCurl(hostUrl, r)
 	if err != nil {
 		w.Write([]byte("false"))
+		return
 	}
 
 	if responseValidate.StatusCode == 200 {

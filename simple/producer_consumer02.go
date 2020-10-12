@@ -21,6 +21,7 @@ func consume() {
 		msg := <-msgs
 		fmt.Println(msg)
 	}
+	fmt.Println("channel is closed")
 }
 
 func main() {
