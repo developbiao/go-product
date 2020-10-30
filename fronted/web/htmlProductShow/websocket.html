@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket Demo</title>
+</head>
+<h3>Web Socket Demo</h3>
+<p>
+    Message: <input id="message" type="text" value="Hello go!" />
+    <input type="button" onclick="send()" value="Send" />
+</p>
+<body>
+<script type="text/javascript">
+   var socket = null;
+   var wsuri = "ws://127.0.0.1:1234";
+
+   window.onload = function() {
+       console.log("onload");
+       socket = new WebSocket(wsuri);
+
+       socket.onopen = function () {
+           console.log("connected to " + wsuri);
+       }
+
+       socket.onclose = function (e) {
+           console.log("connection closed (" + e.code + ")")
+       }
+
+       socket.onmessage = function (e) {
+           console.log("message received: " + e.data);
+       }
+   }
+
+   function send() {
+       var msg = document.getElementById('message').value;
+       socket.send(msg);
+   }
+</script>
+
+</body>
+</html>

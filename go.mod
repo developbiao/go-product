@@ -9,4 +9,5 @@ require (
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/streadway/amqp v1.0.0
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
+	golang.org/x/net v0.0.0-20201029221708-28c70e62bb1d // indirect
 )
