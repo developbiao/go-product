@@ -17,6 +17,7 @@ func main() {
 	conn, err := net.DialTCP("tcp", nil, tcpAddr)
 	checkError(err)
 	_, err = conn.Write([]byte("HEAD / HTTP/1.0\r\n\r\n"))
+	//_, err = conn.Write([]byte("timestamp"))
 	checkError(err)
 	result := make([]byte, 256)
 	_, err = conn.Read(result)
