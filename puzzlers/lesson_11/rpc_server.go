@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"net/rpc"
+	"net/rpc/jsonrpc"
 	"os"
 )
 
@@ -52,7 +53,7 @@ func main() {
 		if err != nil {
 			continue
 		}
-		rpc.ServeConn(conn)
+		jsonrpc.ServeConn(conn)
 	}
 
 }

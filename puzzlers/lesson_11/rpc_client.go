@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
-	"net/rpc"
+	"net/rpc/jsonrpc"
 	"os"
 )
 
@@ -23,7 +23,7 @@ func main() {
 	service := os.Args[1]
 
 	// Dial TCP
-	client, err := rpc.Dial("tcp", service)
+	client, err := jsonrpc.Dial("tcp", service)
 	if err != nil {
 		log.Fatal("dialing:", err)
 	}
