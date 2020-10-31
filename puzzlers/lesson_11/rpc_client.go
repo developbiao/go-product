@@ -17,13 +17,13 @@ type Quotient struct {
 
 func main() {
 	if len(os.Args) != 2 {
-		fmt.Println("Usage: ", os.Args[0], "server")
+		fmt.Println("Usage: ", os.Args[0], "server:port")
 		os.Exit(1)
 	}
-	serverAddress := os.Args[1]
+	service := os.Args[1]
 
-	// Dial HTTP
-	client, err := rpc.DialHTTP("tcp", serverAddress+":1234")
+	// Dial TCP
+	client, err := rpc.Dial("tcp", service)
 	if err != nil {
 		log.Fatal("dialing:", err)
 	}
